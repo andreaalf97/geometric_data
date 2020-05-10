@@ -5,22 +5,10 @@ import java.util.*;
 
 import Jama.Matrix;
 import Jama.SingularValueDecomposition;
-import jv.geom.PgBndPolygon;
 import jv.geom.PgElementSet;
-import jv.geom.PgPolygonSet;
-import jv.geom.PgVectorField;
-import jv.geom.PuCleanMesh;
-import jv.number.PdColor;
-import jv.object.PsConfig;
 import jv.object.PsDebug;
-import jv.object.PsObject;
-import jv.project.PgGeometry;
 import jv.vecmath.PdMatrix;
 import jv.vecmath.PdVector;
-import jv.vecmath.PiVector;
-import jv.vecmath.PuMath;
-import jv.viewer.PvDisplay;
-import jv.project.PvGeometryIf;
 
 import jvx.project.PjWorkshop;
 
