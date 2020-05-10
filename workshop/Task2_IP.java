@@ -35,6 +35,7 @@ public class Task2_IP extends PjWorkshop_IP implements ActionListener{
     protected   Button			m_bSetSurfaces;
     protected   PuDouble        m_kSlider;
     protected   PuDouble        m_pSlider;
+    protected   PuDouble        m_precision;
     protected   Button          m_runButton;
 
     protected	Task2           m_task2;
@@ -97,15 +98,15 @@ public class Task2_IP extends PjWorkshop_IP implements ActionListener{
         p_pParam.setLayout(new BorderLayout());
 
         m_kSlider = new PuDouble("K parameter");
-        m_kSlider.setDefValue(3);
+        m_kSlider.setDefValue(1.5);
         m_kSlider.setDefBounds(1,10,0.5,1);
         m_kSlider.addUpdateListener(this);
         m_kSlider.init();
         p_kParam.add(m_kSlider.getInfoPanel());
 
         m_pSlider = new PuDouble("P parameter");
-        m_pSlider.setDefValue(0.3);
-        m_pSlider.setDefBounds(0.1,0.9,0.1,1);
+        m_pSlider.setDefValue(0.1);
+        m_pSlider.setDefBounds(0.01,0.9,0.1,1);
         m_pSlider.addUpdateListener(this);
         m_pSlider.init();
         p_pParam.add(m_pSlider.getInfoPanel());
@@ -113,13 +114,24 @@ public class Task2_IP extends PjWorkshop_IP implements ActionListener{
         pParameters.add(p_kParam);
         pParameters.add(p_pParam);
 
+        add(pParameters);
+
+        Panel p_precision = new Panel();
+        p_precision.setLayout(new BorderLayout());
+
+        m_precision = new PuDouble("Precision for convergence");
+        m_precision.setDefValue(0.01);
+        m_precision.setDefBounds(0.0001,0.5,0.001,1);
+        m_precision.addUpdateListener(this);
+        m_precision.init();
+        p_precision.add(m_precision.getInfoPanel());
+        add(p_precision);
+
         Panel pRunButton = new Panel(new BorderLayout());
         m_runButton = new Button("RUN");
         m_runButton.addActionListener(this);
         pRunButton.add(m_runButton, BorderLayout.CENTER);
         add(pRunButton);
-
-        add(pParameters);
 
         updateGeomList();
         validate();
@@ -140,6 +152,10 @@ public class Task2_IP extends PjWorkshop_IP implements ActionListener{
         }
         else if(event == m_pSlider){
             m_task2.setP(m_pSlider.getValue());
+            return true;
+        }
+        else if(event == m_precision){
+            m_task2.setPrecision(m_precision.getValue());
             return true;
         }
         else

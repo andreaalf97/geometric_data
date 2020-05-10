@@ -35,9 +35,11 @@ public class Task2 extends PjWorkshop {
     /** Second surface to be registered. */
     PgElementSet	m_surfQ;
     /** K parameter for the median algorithm */
-    double k = 3.0;
+    double k = 1.5;
     /** Percentage of random points to select */
-    double p = 0.3;
+    double p = 0.1;
+    /** How close to optimal for convergence */
+    double conv_precision = 0.001;
 
 
     /** Constructor */
@@ -111,7 +113,7 @@ public class Task2 extends PjWorkshop {
 //            printPdVector("T OPTIMAL", T_opt);
 //            PsDebug.message("Average = " + T_opt.average());
 
-            if(Math.abs(T_opt.average()) < 0.01)
+            if(Math.abs(T_opt.average()) < this.conv_precision)
                 converged = true;
 
             PsDebug.message("ITERATION: " + steps);
@@ -336,5 +338,9 @@ public class Task2 extends PjWorkshop {
         }
 
         return vertices;
+    }
+
+    public void setPrecision(double precision) {
+        this.conv_precision = precision;
     }
 }

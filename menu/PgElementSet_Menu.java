@@ -100,6 +100,7 @@ public class PgElementSet_Menu extends PgPointSet_Menu {
 			dialog = new PjWorkshop_Dialog(false);
 			dialog.setParent(task2);
 			dialog.update(task2);
+			dialog.setSize(700, 400);
 			dialog.setVisible(true);
 			break;
 		}
