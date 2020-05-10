@@ -3,6 +3,7 @@ package workshop;
 import java.awt.Color;
 import java.util.*;
 
+import Jama.Matrix;
 import jv.geom.PgBndPolygon;
 import jv.geom.PgElementSet;
 import jv.geom.PgPolygonSet;
@@ -84,23 +85,91 @@ public class Task2 extends PjWorkshop {
             int[] validIndices = getValidIndices(randomVectorsP, closestVerticesQ, this.k);
             PsDebug.message("There are " + validIndices.length + " valid indices after checking the median");
 
-            PdVector[] validIndicesP = new PdVector[validIndices.length];
-            PdVector[] validIndicesQ = new PdVector[validIndices.length];
+            PdVector[] p_subset = new PdVector[validIndices.length];
+            PdVector[] q_subset = new PdVector[validIndices.length];
             for(int i = 0; i < validIndices.length; i++){
-                validIndicesP[i] = randomVectorsP[validIndices[i]];
-                validIndicesQ[i] = closestVerticesQ[validIndices[i]];
+                p_subset[i] = randomVectorsP[validIndices[i]];
+                q_subset[i] = closestVerticesQ[validIndices[i]];
             }
+
+            PdVector p_centroid = computeCentroid(p_subset);
+            PdVector q_centroid = computeCentroid(q_subset);
+
+            Matrix M = computeM(p_subset, p_centroid, q_subset, q_centroid);
+
+
 
 
 
             converged = true;
+            m_surfP.update(m_surfP);
+            m_surfQ.update(m_surfQ);
         }
-
 
 
 
         m_surfP.update(m_surfP);
         m_surfQ.update(m_surfQ);
+
+    }
+
+    /** This function computes the matrix M of the optimal rigid tranformation algorithm */
+    private Matrix computeM(PdVector[] p_subset, PdVector p_centroid, PdVector[] q_subset, PdVector q_centroid) {
+
+        if(p_subset.length != q_subset.length)
+            throw new RuntimeException("P subset and Q subset are of different length");
+
+        double[][] M = {
+                {0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0}
+        };
+
+        for(int i = 0; i < p_subset.length; i++){
+
+            PdVector p = PdVector.subNew(p_subset[i], p_centroid);
+            PdVector q = PdVector.subNew(q_subset[i], q_centroid);
+
+            for(int row = 0; row < 3; row++)
+                for(int col = 0; col < 3; col++)
+                    M[row][col] += p.getEntry(row) * q.getEntry(col);
+
+        }
+
+        for(int row = 0; row < 3; row++)
+            for(int col = 0; col < 3; col++)
+                M[row][col] /= p_subset.length;
+
+
+        PsDebug.message("MATRIX M:");
+        for(int row = 0; row < 3; row++){
+            String s = "";
+            for(int col = 0; col < 3; col++) {
+                s += "" + M[row][col] + " ";
+            }
+            PsDebug.message(s);
+        }
+
+
+        return new Matrix(M);
+    }
+
+    /** This function computes the centroid of a list of vectors */
+    private PdVector computeCentroid(PdVector[] set) {
+
+        if(set.length == 0)
+            throw new RuntimeException("The set has lenght 0");
+
+        double[] init = {0, 0, 0};
+        PdVector centroid = new PdVector(init);
+
+        for(PdVector vector : set)
+            centroid.add(vector);
+
+        centroid.multScalar(1 / set.length);
+
+        return centroid;
+
     }
 
     /**
