@@ -18,7 +18,8 @@ public class PgElementSet_Menu extends PgPointSet_Menu {
 	
 	private enum MenuEntry{
 		MyWorkshop			("MyWorkshop..."),
-		Registration		("Surface Registration...")
+		Registration		("Surface Registration..."),
+		Task2				("Task 2...")
 		// Additional entries...
 		;
 		protected final String name;
@@ -87,6 +88,18 @@ public class PgElementSet_Menu extends PgPointSet_Menu {
 			dialog = new PjWorkshop_Dialog(false);
 			dialog.setParent(reg);
 			dialog.update(reg);
+			dialog.setVisible(true);
+			break;
+		case Task2:
+			Task2 task2 = new Task2();
+			task2.setGeometry(m_elementSet);
+			if (currDisp == null) {
+				if (PsDebug.WARNING) PsDebug.warning("missing display.");
+			} else
+				task2.setDisplay(currDisp);
+			dialog = new PjWorkshop_Dialog(false);
+			dialog.setParent(task2);
+			dialog.update(task2);
 			dialog.setVisible(true);
 			break;
 		}
