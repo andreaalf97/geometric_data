@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.*;
 
 import Jama.Matrix;
+import Jama.SingularValueDecomposition;
 import jv.geom.PgBndPolygon;
 import jv.geom.PgElementSet;
 import jv.geom.PgPolygonSet;
@@ -14,6 +15,7 @@ import jv.object.PsConfig;
 import jv.object.PsDebug;
 import jv.object.PsObject;
 import jv.project.PgGeometry;
+import jv.vecmath.PdMatrix;
 import jv.vecmath.PdVector;
 import jv.vecmath.PiVector;
 import jv.vecmath.PuMath;
@@ -75,15 +77,16 @@ public class Task2 extends PjWorkshop {
     public void run() {
         PsDebug.message("RUN pressed");
 
-        PdVector[] randomVectorsP = getRandomVectors(this.p, true);
+        PdVector[] randomVectorsP = getRandomVectors(this.p, false);
 
         boolean converged = false;
+        int steps = 0;
         while(!converged){
 
             PdVector[] closestVerticesQ = findClosestVertices(randomVectorsP);
 
             int[] validIndices = getValidIndices(randomVectorsP, closestVerticesQ, this.k);
-            PsDebug.message("There are " + validIndices.length + " valid indices after checking the median");
+//            PsDebug.message("There are " + validIndices.length + " valid indices after checking the median");
 
             PdVector[] p_subset = new PdVector[validIndices.length];
             PdVector[] q_subset = new PdVector[validIndices.length];
@@ -97,20 +100,90 @@ public class Task2 extends PjWorkshop {
 
             Matrix M = computeM(p_subset, p_centroid, q_subset, q_centroid);
 
+            Matrix R_opt = computeRopt(M.svd());
+            PdVector T_opt = computeTopt(R_opt, q_centroid, p_centroid);
 
+            for(PdVector vertex : m_surfP.getVertices()) {
+                vertex.leftMultMatrix(new PdMatrix(R_opt.getArrayCopy()));
+                vertex.add(T_opt);
+            }
+//
+//            printPdVector("T OPTIMAL", T_opt);
+//            PsDebug.message("Average = " + T_opt.average());
 
+            if(Math.abs(T_opt.average()) < 0.01)
+                converged = true;
 
+            PsDebug.message("ITERATION: " + steps);
+            steps++;
 
-            converged = true;
-            m_surfP.update(m_surfP);
-            m_surfQ.update(m_surfQ);
+//
+//            m_surfP.update(m_surfP);
+//            m_surfQ.update(m_surfQ);
         }
 
-
+        PsDebug.message("CONVERGED IN " + steps + " STEPS");
 
         m_surfP.update(m_surfP);
         m_surfQ.update(m_surfQ);
 
+    }
+
+    /** This function computes the T_optimal vector */
+    private PdVector computeTopt(Matrix r_opt, PdVector q_centroid, PdVector p_centroid) {
+
+        PdVector RP = new PdVector();
+        RP = RP.leftMultMatrix(new PdMatrix(r_opt.getArrayCopy()), p_centroid);
+
+        PdVector T_opt = PdVector.subNew(q_centroid, RP);
+
+        return T_opt;
+    }
+
+    private void printMatrix(String name, Matrix matrix) {
+        PsDebug.message(name + ":");
+        for(int row = 0; row < 3; row++){
+            String s = "";
+            for(int col = 0; col < 3; col++) {
+                s += "" + matrix.get(row, col) + " ";
+            }
+            PsDebug.message(s);
+        }
+    }
+
+    private void printPdVector(String name, PdVector vect) {
+        String s = "";
+        for(int i = 0; i < vect.getSize(); i++)
+            s += "" + vect.getEntry(i) + " ";
+        PsDebug.message(name + ":");
+        PsDebug.message(s);
+    }
+
+    private void printPdVector(PdVector vect) {
+        String s = "";
+        for(int i = 0; i < vect.getSize(); i++)
+            s += "" + vect.getEntry(i) + " ";
+        PsDebug.message(s);
+    }
+
+    /** This function computes the R_optimal matrix */
+    private Matrix computeRopt(SingularValueDecomposition svd) {
+
+        Matrix U_t = svd.getU().transpose();
+        Matrix VU_t = svd.getV().times(U_t);
+        double det_VU_t = VU_t.det();
+
+        double[][] mid_matrix_temp = {
+                {1.0, 0.0, 0.0},
+                {0.0, 1.0, 0.0},
+                {0.0, 0.0, det_VU_t}
+        };
+        Matrix mid_matrix = new Matrix(mid_matrix_temp);
+
+        Matrix R_opt = svd.getV().times(mid_matrix);
+        R_opt = R_opt.times(U_t);
+
+        return R_opt;
     }
 
     /** This function computes the matrix M of the optimal rigid tranformation algorithm */
@@ -140,17 +213,6 @@ public class Task2 extends PjWorkshop {
             for(int col = 0; col < 3; col++)
                 M[row][col] /= p_subset.length;
 
-
-        PsDebug.message("MATRIX M:");
-        for(int row = 0; row < 3; row++){
-            String s = "";
-            for(int col = 0; col < 3; col++) {
-                s += "" + M[row][col] + " ";
-            }
-            PsDebug.message(s);
-        }
-
-
         return new Matrix(M);
     }
 
@@ -160,15 +222,16 @@ public class Task2 extends PjWorkshop {
         if(set.length == 0)
             throw new RuntimeException("The set has lenght 0");
 
-        double[] init = {0, 0, 0};
-        PdVector centroid = new PdVector(init);
+        double[] temp = {0, 0, 0};
 
         for(PdVector vector : set)
-            centroid.add(vector);
+            for(int i = 0; i < vector.getSize(); i++)
+                temp[i] += vector.getEntry(i);
 
-        centroid.multScalar(1 / set.length);
+        for(int i = 0; i < temp.length; i++)
+            temp[i] /= set.length;
 
-        return centroid;
+        return new PdVector(temp);
 
     }
 
@@ -187,10 +250,10 @@ public class Task2 extends PjWorkshop {
         List<Double> sortedList = Arrays.asList(distances);
         Collections.sort(sortedList);
 
-        PsDebug.message("The distances go from " + sortedList.get(0) + " to " + sortedList.get(sortedList.size() - 1));
+//        PsDebug.message("The distances go from " + sortedList.get(0) + " to " + sortedList.get(sortedList.size() - 1));
 
         double median = sortedList.get(sortedList.size() / 2);
-        PsDebug.message("MEDIAN: " + median);
+//        PsDebug.message("MEDIAN: " + median);
 
         List<Integer> validIndices = new ArrayList<>();
         for(int i = 0; i < distances.length; i++)
