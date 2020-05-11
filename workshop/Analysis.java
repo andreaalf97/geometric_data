@@ -42,7 +42,7 @@ public class Analysis extends PjWorkshop {
         m_geom = surfP;
     }
 
-    public String genus()
+    public void genus(int index)
     {
         int numOfEdges = m_geom.getNumEdges();
         int numOfVertices = m_geom.getNumVertices();
@@ -50,14 +50,23 @@ public class Analysis extends PjWorkshop {
         // Num of Faces is equal to two thirds of the number of edges, every triangle has 3 edges and every edge is in 2 triangles
         int numOfFaces = 2*(numOfEdges/3);
         double vol = m_geom.getVolume();
+        int comp = m_geom.getNumElements();
 
 
         String nums = "\n\n\nNumber of Edges: " + numOfEdges + "\nNumber of Vertices: " + numOfVertices + "\nNumber of Borders: " + numOfBorders + "\nNumber of Faces: " + numOfFaces;
         int genusNumValue = (int) (1 - (float)(numOfVertices + numOfBorders + numOfFaces - numOfEdges)/2);
+
         String genus = "\nGenus =  " + genusNumValue;
 
-        String volume = "\n\nThe Volume enclosed by the surface is: " + vol;
+        String volume = "\n\n\nThe Volume enclosed by the surface is: " + vol;
 
-        return nums + genus + volume;
+        String components = "\n\n\nThe Components of the surface are: " + comp;
+
+        if(index == 0)
+            PsDebug.message(nums + genus);
+        else if(index == 1)
+            PsDebug.message(volume);
+        else
+            PsDebug.message("Choose one!!!");
     }
 }

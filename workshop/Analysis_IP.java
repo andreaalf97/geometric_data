@@ -21,8 +21,8 @@ import jvx.project.PjWorkshop_IP;
 public class Analysis_IP extends PjWorkshop_IP implements ActionListener{
 
     protected List m_list;
-    protected Button m_bSetSurfaces;
-    Analysis m_ws;
+    protected Button m_bChooseCalculation;
+    Analysis m_task1;
 
     /** Constructor */
     public Analysis_IP () {
@@ -42,7 +42,7 @@ public class Analysis_IP extends PjWorkshop_IP implements ActionListener{
 
     public void setParent(PsUpdateIf parent) {
         super.setParent(parent);
-        m_ws = (Analysis)parent;
+        m_task1 = (Analysis)parent;
 
         addSubTitle("Select calculation to be executed");
 
@@ -62,19 +62,23 @@ public class Analysis_IP extends PjWorkshop_IP implements ActionListener{
         add(pGeometries);
 
         Panel pSetSurfaces = new Panel(new BorderLayout());
-        m_bSetSurfaces = new Button("Choose");
-        m_bSetSurfaces.addActionListener(this);
-        pSetSurfaces.add(m_bSetSurfaces, BorderLayout.CENTER);
+        m_bChooseCalculation = new Button("Choose");
+        m_bChooseCalculation.addActionListener(this);
+        pSetSurfaces.add(m_bChooseCalculation, BorderLayout.CENTER);
         add(pSetSurfaces);
-
-
-
-
-
         validate();
     }
 
+    /**
+     * Handle action events fired by buttons etc.
+     */
+    public void actionPerformed(ActionEvent event) {
+        Object source = event.getSource();
+        if (source == m_bChooseCalculation)
+            m_task1.genus(m_list.getSelectedIndex());
 
+
+    }
 
 
 
