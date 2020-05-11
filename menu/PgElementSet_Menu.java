@@ -5,6 +5,7 @@ import jv.geom.PgElementSet;
 import jv.geom.PgPointSet;
 import jv.object.PsDebug;
 import jv.object.PsDialog;
+import jv.object.PsUpdateIf;
 import jv.objectGui.PsMethodMenu;
 import jv.object.PsObject;
 import jv.project.PgGeometryIf;
@@ -93,7 +94,15 @@ public class PgElementSet_Menu extends PgPointSet_Menu {
 		case Analysis:
 			Analysis task1 = new Analysis();
 			task1.setGeometry(m_elementSet);
-			PsDebug.message(task1.genus());
+			if (currDisp == null) {
+				if (PsDebug.WARNING) PsDebug.warning("missing display.");
+			} else
+				task1 .setDisplay(currDisp);
+			dialog = new PjWorkshop_Dialog(false);
+			dialog.setParent(task1);
+			dialog.update(task1);
+			dialog.setSize(700, 400);
+			dialog.setVisible(true);
 			break;
 		}
 		
