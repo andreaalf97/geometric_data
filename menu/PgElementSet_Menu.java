@@ -92,7 +92,7 @@ public class PgElementSet_Menu extends PgPointSet_Menu {
 			break;
 		case Analysis:
 			Analysis analysis = new Analysis();
-			analysis.setGeometry(m_elementSet);
+			//analysis.setGeometry(m_elementSet);
 			if (currDisp == null) {
 				if (PsDebug.WARNING) PsDebug.warning("missing display.");
 			} else
