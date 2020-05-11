@@ -1,11 +1,25 @@
 package workshop;
 
+import java.awt.Color;
+import java.util.*;
+
+import Jama.Matrix;
+import Jama.SingularValueDecomposition;
 import jv.geom.PgElementSet;
-import jv.project.PgGeometry;
+import jv.object.PsDebug;
+import jv.vecmath.PdMatrix;
+import jv.vecmath.PdVector;
+
+import jvx.project.PjWorkshop;
 
 public class Analysis {
 
     PgElementSet m_geom;
+
+    public void setGeometry(PgElementSet surfP) {
+        PsDebug.message("Geometries set");
+        m_geom = surfP;
+    }
 
     public String genus()
     {
