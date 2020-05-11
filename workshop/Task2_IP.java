@@ -33,12 +33,15 @@ public class Task2_IP extends PjWorkshop_IP implements ActionListener{
     protected	List			m_listPassive;
     protected	Vector			m_geomList;
     protected   Button			m_bSetSurfaces;
+    protected   Button			m_bChangeDistanceMetric;
     protected   PuDouble        m_kSlider;
     protected   PuDouble        m_pSlider;
     protected   PuDouble        m_precision;
     protected   Button          m_runButton;
 
     protected	Task2           m_task2;
+
+    private boolean euclideanDistance = true;
 
     /** Constructor */
     public Task2_IP () {
@@ -88,6 +91,12 @@ public class Task2_IP extends PjWorkshop_IP implements ActionListener{
         m_bSetSurfaces.addActionListener(this);
         pSetSurfaces.add(m_bSetSurfaces, BorderLayout.CENTER);
         add(pSetSurfaces);
+
+        Panel pChangeDistance = new Panel(new BorderLayout());
+        m_bChangeDistanceMetric = new Button("EUCLIDEAN DISTANCE");
+        m_bChangeDistanceMetric.addActionListener(this);
+        pChangeDistance.add(m_bChangeDistanceMetric, BorderLayout.CENTER);
+        add(pChangeDistance);
 
         Panel pParameters = new Panel();
         pParameters.setLayout(new GridLayout(1, 2));
@@ -208,6 +217,17 @@ public class Task2_IP extends PjWorkshop_IP implements ActionListener{
                 PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);
                 PsDebug.message(sw.toString());
+            }
+        }
+        else if(source == m_bChangeDistanceMetric){
+            m_task2.changeDistanceMetric();
+            if(euclideanDistance){
+                m_bChangeDistanceMetric.setLabel("POINT TO PLANE DISTANCE");
+                euclideanDistance = false;
+            }
+            else {
+                m_bChangeDistanceMetric.setLabel("EUCLIDEAN DISTANCE");
+                euclideanDistance = true;
             }
         }
     }

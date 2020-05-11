@@ -10,6 +10,8 @@ import jv.object.PsDebug;
 import jv.vecmath.PdMatrix;
 import jv.vecmath.PdVector;
 
+import jv.vecmath.PuMath;
+import jv.vecmath.PuVectorGeom;
 import jvx.project.PjWorkshop;
 
 /**
@@ -28,6 +30,8 @@ public class Task2 extends PjWorkshop {
     double p = 0.1;
     /** How close to optimal for convergence */
     double conv_precision = 0.001;
+    /** This allows us to know if the user wants the euclidean or the ptp distance */
+    boolean euclideanDistance = true;
 
 
     /** Constructor */
@@ -107,7 +111,7 @@ public class Task2 extends PjWorkshop {
             PsDebug.message("ITERATION: " + steps);
             steps++;
 
-//
+////
 //            m_surfP.update(m_surfP);
 //            m_surfQ.update(m_surfQ);
         }
@@ -116,6 +120,16 @@ public class Task2 extends PjWorkshop {
 
         m_surfP.update(m_surfP);
         m_surfQ.update(m_surfQ);
+
+    }
+
+    private boolean conv(Matrix r_opt, double conv_precision) {
+
+        double sum = 0;
+        for(int i = 0; i < r_opt.getColumnDimension(); i++)
+            sum += Math.abs(r_opt.get(i, i) - 1);
+
+        return sum < conv_precision;
 
     }
 
@@ -269,10 +283,25 @@ public class Task2 extends PjWorkshop {
         for(int index = 0; index < verticesP.length; index++){
             PdVector vertexP = verticesP[index];
 
-            double minDistance = PdVector.dist(vertexP, m_surfQ.getVertices()[0]);
+            double minDistance;
+            if(euclideanDistance)
+                minDistance = PdVector.dist(vertexP, m_surfQ.getVertices()[0]);
+            else {
+                minDistance = pointToPlaneDistance(vertexP, m_surfQ.getVertices()[0], m_surfQ.getVertexNormal(0));
+//                PsDebug.message("Using point to plane distance");
+            }
             PdVector closestVertex = m_surfQ.getVertices()[0];
-            for(PdVector vertexQ : m_surfQ.getVertices()){
-                double dist = PdVector.dist(vertexP, vertexQ);
+            for(int k = 0; k < m_surfQ.getNumVertices(); k++) {
+                PdVector vertexQ = m_surfQ.getVertex(k);
+
+                double dist;
+                if(euclideanDistance)
+                    dist = PdVector.dist(vertexP, vertexQ);
+                else
+                    dist = pointToPlaneDistance(vertexP, vertexQ, m_surfQ.getVertexNormal(k));
+
+
+
                 if(dist < minDistance){
                     minDistance = dist;
                     closestVertex = vertexQ;
@@ -283,6 +312,14 @@ public class Task2 extends PjWorkshop {
         }
 
         return closestVertices;
+    }
+
+    private double pointToPlaneDistance(PdVector vertexP, PdVector vertexQ, PdVector vertexNormal) {
+
+        PdVector diff = PdVector.subNew(vertexP, vertexQ);
+
+        return Math.abs(PuMath.dot(diff.getEntries(), vertexNormal.getEntries()));
+
     }
 
     /**
@@ -330,5 +367,10 @@ public class Task2 extends PjWorkshop {
 
     public void setPrecision(double precision) {
         this.conv_precision = precision;
+    }
+
+    public void changeDistanceMetric() {
+        this.euclideanDistance = ! this.euclideanDistance;
+        PsDebug.message("Euclidean Distance: " + this.euclideanDistance);
     }
 }
