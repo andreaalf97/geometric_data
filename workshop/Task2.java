@@ -11,7 +11,6 @@ import jv.vecmath.PdMatrix;
 import jv.vecmath.PdVector;
 
 import jv.vecmath.PuMath;
-import jv.vecmath.PuVectorGeom;
 import jvx.project.PjWorkshop;
 
 /**
@@ -77,35 +76,74 @@ public class Task2 extends PjWorkshop {
         int steps = 0;
         while(!converged){
 
-            PdVector[] closestVerticesQ = findClosestVertices(randomVectorsP);
+            Map<Integer[], PdVector[]> mapOfClosestVertices = findClosestVertices(randomVectorsP);
+
+            PdVector[] closestVerticesQ = (PdVector[])(mapOfClosestVertices.values().toArray()[0]);
+            Integer[] tempIndicesOfQ = (Integer[])(mapOfClosestVertices.keySet().toArray()[0]);
 
             int[] validIndices = getValidIndices(randomVectorsP, closestVerticesQ, this.k);
 //            PsDebug.message("There are " + validIndices.length + " valid indices after checking the median");
 
             PdVector[] p_subset = new PdVector[validIndices.length];
             PdVector[] q_subset = new PdVector[validIndices.length];
+            Integer[] indicesOfQ = new Integer[validIndices.length];
             for(int i = 0; i < validIndices.length; i++){
                 p_subset[i] = randomVectorsP[validIndices[i]];
                 q_subset[i] = closestVerticesQ[validIndices[i]];
+                indicesOfQ[i] = tempIndicesOfQ[validIndices[i]];
             }
 
-            PdVector p_centroid = computeCentroid(p_subset);
-            PdVector q_centroid = computeCentroid(q_subset);
+            Matrix R_opt = null;
+            PdVector T_opt = null;
 
-            Matrix M = computeM(p_subset, p_centroid, q_subset, q_centroid);
+            if(this.euclideanDistance) {
+                PdVector p_centroid = computeCentroid(p_subset);
+                PdVector q_centroid = computeCentroid(q_subset);
 
-            Matrix R_opt = computeRopt(M.svd());
-            PdVector T_opt = computeTopt(R_opt, q_centroid, p_centroid);
+                Matrix M = computeM(p_subset, p_centroid, q_subset, q_centroid);
 
-            for(PdVector vertex : m_surfP.getVertices()) {
+                R_opt = computeSVDapprox(M.svd());
+                T_opt = computeTopt(R_opt, q_centroid, p_centroid);
+            }
+            else{
+
+                Matrix A = calcMatrixA(p_subset, indicesOfQ);
+                PdVector b = calcVectorB(p_subset, q_subset, indicesOfQ);
+//                double c = calcC(p_subset, q_subset, indicesOfQ);
+
+                b.multScalar(-1);
+                Matrix A_inv = A.inverse();
+
+                b.rightMultMatrix(new PdMatrix(A_inv.getArray()));
+
+                if(b.getSize() != 6)
+                    throw new RuntimeException("Size of (r t) is not 6");
+
+                double[] r = new double[3];
+                double[] t = new double[3];
+                for(int i = 0; i < 3; i++){
+                    r[i] = b.getEntries()[i];
+                    t[i] = b.getEntries()[i+3];
+                }
+
+                T_opt = new PdVector(t);
+
+                double[][] R_linear = {
+                        {1, -r[2], r[1]},
+                        {r[2], 1, -r[0]},
+                        {-r[1], r[0], 1}
+                };
+
+                R_opt = computeSVDapprox((new Matrix(R_linear)).svd());
+
+            }
+
+            for (PdVector vertex : m_surfP.getVertices()) {
                 vertex.leftMultMatrix(new PdMatrix(R_opt.getArrayCopy()));
                 vertex.add(T_opt);
             }
-//
-//            printPdVector("T OPTIMAL", T_opt);
-//            PsDebug.message("Average = " + T_opt.average());
 
-            if(Math.abs(T_opt.average()) < this.conv_precision)
+            if(getConvergenceValue(T_opt, R_opt) < this.conv_precision || steps > 5)
                 converged = true;
 
             PsDebug.message("ITERATION: " + steps);
@@ -121,6 +159,90 @@ public class Task2 extends PjWorkshop {
         m_surfP.update(m_surfP);
         m_surfQ.update(m_surfQ);
 
+    }
+
+    private PdVector calcVectorB(PdVector[] p_subset, PdVector[] q_subset, Integer[] indicesOfQ) {
+
+        double[] b = {0, 0, 0, 0, 0, 0};
+
+        for(int i = 0; i < p_subset.length; i++){
+
+            PdVector n_i = m_surfQ.getVertexNormal(indicesOfQ[i]);
+            PdVector p_i = p_subset[i];
+            PdVector p_iXn_i = PdVector.crossNew(p_i, n_i);
+
+            double left = PdVector.dot(PdVector.subNew(p_i, q_subset[i]), n_i);
+            double[] right_d = {
+                    p_iXn_i.getEntry(0),
+                    p_iXn_i.getEntry(1),
+                    p_iXn_i.getEntry(2),
+                    n_i.getEntry(0),
+                    n_i.getEntry(1),
+                    n_i.getEntry(2)
+            };
+
+            PdVector right = new PdVector(right_d);
+            right.multScalar(left);
+
+            for(int j = 0; j < 6; j++)
+                b[j] += right.getEntry(j);
+
+        }
+
+        return new PdVector(b);
+    }
+
+    private Matrix calcMatrixA(PdVector[] p_subset, Integer[] indicesOfQ) {
+
+        double[][] left = new double[6][p_subset.length];
+        double[][] right = new double[p_subset.length][6];
+
+        for(int k = 0; k < p_subset.length; k++) {
+            PdVector n_i = m_surfQ.getVertexNormal(indicesOfQ[k]);
+            PdVector p_i = p_subset[k];
+            PdVector p_iXn_i = PdVector.crossNew(p_i, n_i);
+
+            for(int i = 0; i < 3; i++){
+                left[i][k] = p_iXn_i.getEntry(i);
+                left[i+3][k] = n_i.getEntry(i);
+            }
+
+            for(int i = 0; i < 3; i++){
+                right[k][i] = p_iXn_i.getEntry(i);
+                right[k][i+3] = n_i.getEntry(i);
+            }
+        }
+
+        Matrix A = new Matrix(left).times(new Matrix(right));
+        return A;
+
+    }
+
+    private double getConvergenceValue(PdVector t_opt, Matrix r_opt) {
+        if(t_opt.getSize() != 3)
+            throw new RuntimeException("t_opt is not of size 3");
+        if(r_opt.getRowDimension() != 3 || r_opt.getColumnDimension() != 3)
+            throw new RuntimeException("r_opt is not of size 3x3");
+
+
+        double[][] identity = {
+                {1, 0, 0},
+                {0, 1, 0},
+                {0, 0, 1}
+        };
+
+        double[][] R = r_opt.getArray();
+
+        double errorSum = 0;
+
+        for(int row = 0; row < 3; row++)
+            for(int col = 0; col < 3; col++)
+                errorSum += Math.abs(R[row][col] - identity[row][col]);
+
+        for(int i = 0; i < 3; i++)
+            errorSum += t_opt.getEntry(i);
+
+        return t_opt.average();
     }
 
     private boolean conv(Matrix r_opt, double conv_precision) {
@@ -171,7 +293,7 @@ public class Task2 extends PjWorkshop {
     }
 
     /** This function computes the R_optimal matrix */
-    private Matrix computeRopt(SingularValueDecomposition svd) {
+    private Matrix computeSVDapprox(SingularValueDecomposition svd) {
 
         Matrix U_t = svd.getU().transpose();
         Matrix VU_t = svd.getV().times(U_t);
@@ -276,42 +398,38 @@ public class Task2 extends PjWorkshop {
      * @param verticesP the list of vertices of surface P
      * @return A map which contains
      */
-    private PdVector[] findClosestVertices(PdVector[] verticesP) {
+    private Map<Integer[], PdVector[]> findClosestVertices(PdVector[] verticesP) {
 
         PdVector[] closestVertices = new PdVector[verticesP.length];
+        Integer[] indexOfClosestVertices = new Integer[verticesP.length];
 
         for(int index = 0; index < verticesP.length; index++){
             PdVector vertexP = verticesP[index];
 
             double minDistance;
-            if(euclideanDistance)
-                minDistance = PdVector.dist(vertexP, m_surfQ.getVertices()[0]);
-            else {
-                minDistance = pointToPlaneDistance(vertexP, m_surfQ.getVertices()[0], m_surfQ.getVertexNormal(0));
-//                PsDebug.message("Using point to plane distance");
-            }
+            minDistance = PdVector.dist(vertexP, m_surfQ.getVertices()[0]);
             PdVector closestVertex = m_surfQ.getVertices()[0];
+            Integer indexOfClosestVertex = 0;
+
             for(int k = 0; k < m_surfQ.getNumVertices(); k++) {
                 PdVector vertexQ = m_surfQ.getVertex(k);
 
-                double dist;
-                if(euclideanDistance)
-                    dist = PdVector.dist(vertexP, vertexQ);
-                else
-                    dist = pointToPlaneDistance(vertexP, vertexQ, m_surfQ.getVertexNormal(k));
-
-
+                double dist = PdVector.dist(vertexP, vertexQ);
 
                 if(dist < minDistance){
                     minDistance = dist;
                     closestVertex = vertexQ;
+                    indexOfClosestVertex = k;
                 }
             }
 
             closestVertices[index] = closestVertex;
+            indexOfClosestVertices[index] = indexOfClosestVertex;
         }
 
-        return closestVertices;
+        Map<Integer[], PdVector[]> res = new HashMap<>();
+        res.put(indexOfClosestVertices, closestVertices);
+        return res;
     }
 
     private double pointToPlaneDistance(PdVector vertexP, PdVector vertexQ, PdVector vertexNormal) {
