@@ -93,8 +93,8 @@ public class Task2 extends PjWorkshop {
                 indicesOfQ[i] = tempIndicesOfQ[validIndices[i]];
             }
 
-            Matrix R_opt = null;
-            PdVector T_opt = null;
+            Matrix R_opt;
+            PdVector T_opt;
 
             if(this.euclideanDistance) {
                 PdVector p_centroid = computeCentroid(p_subset);
@@ -143,15 +143,15 @@ public class Task2 extends PjWorkshop {
                 vertex.add(T_opt);
             }
 
-            if(getConvergenceValue(T_opt, R_opt) < this.conv_precision || steps > 5)
+            if(getConvergenceValue(T_opt, R_opt) < this.conv_precision)
                 converged = true;
 
             PsDebug.message("ITERATION: " + steps);
             steps++;
 
-////
-//            m_surfP.update(m_surfP);
-//            m_surfQ.update(m_surfQ);
+
+            m_surfP.update(m_surfP);
+            m_surfQ.update(m_surfQ);
         }
 
         PsDebug.message("CONVERGED IN " + steps + " STEPS");
@@ -240,9 +240,9 @@ public class Task2 extends PjWorkshop {
                 errorSum += Math.abs(R[row][col] - identity[row][col]);
 
         for(int i = 0; i < 3; i++)
-            errorSum += t_opt.getEntry(i);
+            errorSum += Math.abs(t_opt.getEntry(i));
 
-        return t_opt.average();
+        return errorSum;
     }
 
     private boolean conv(Matrix r_opt, double conv_precision) {
