@@ -115,4 +115,12 @@ public class Analysis_IP extends PjWorkshop_IP implements ActionListener{
             m_task1.setGeometry((PgElementSet)m_geomList.elementAt(m_listPassive.getSelectedIndex()));
             m_task1.genus(m_list.getSelectedIndex());
     }
+
+    /**
+     * Get information which bottom buttons a dialog should create
+     * when showing this info panel.
+     */
+    protected int getDialogButtons() {
+        return PsDialog.BUTTON_OK;
+    }
 }
