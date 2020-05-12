@@ -4,3 +4,4 @@ run*.bat
 workshop/*.class
 .idea/
 *.iml
+menu/*.class
