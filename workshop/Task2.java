@@ -81,6 +81,9 @@ public class Task2 extends PjWorkshop {
             PdVector[] closestVerticesQ = (PdVector[])(mapOfClosestVertices.values().toArray()[0]);
             Integer[] tempIndicesOfQ = (Integer[])(mapOfClosestVertices.keySet().toArray()[0]);
 
+            //PsDebug.message("Q length: " + closestVerticesQ.length + " P length: " + randomVectorsP.length);
+
+
             int[] validIndices = getValidIndices(randomVectorsP, closestVerticesQ, this.k);
 //            PsDebug.message("There are " + validIndices.length + " valid indices after checking the median");
 
@@ -114,16 +117,16 @@ public class Task2 extends PjWorkshop {
                 b.multScalar(-1);
                 Matrix A_inv = A.inverse();
 
-                b.rightMultMatrix(new PdMatrix(A_inv.getArray()));
+                PdVector solution = b.leftMultMatrix(new PdMatrix(A_inv.getArray())); //rightMultMatrix
 
-                if(b.getSize() != 6)
+                if(solution.getSize() != 6)
                     throw new RuntimeException("Size of (r t) is not 6");
 
                 double[] r = new double[3];
                 double[] t = new double[3];
                 for(int i = 0; i < 3; i++){
-                    r[i] = b.getEntries()[i];
-                    t[i] = b.getEntries()[i+3];
+                    r[i] = solution.getEntries()[i];
+                    t[i] = solution.getEntries()[i+3];
                 }
 
                 T_opt = new PdVector(t);
@@ -295,19 +298,24 @@ public class Task2 extends PjWorkshop {
     /** This function computes the R_optimal matrix */
     private Matrix computeSVDapprox(SingularValueDecomposition svd) {
 
-        Matrix U_t = svd.getU().transpose();
-        Matrix VU_t = svd.getV().times(U_t);
-        double det_VU_t = VU_t.det();
+        //Matrix U_t = svd.getU().transpose();
+        //Matrix VU_t = svd.getV().times(U_t);
+        //double det_VU_t = VU_t.det();
+
+        Matrix U = svd.getU();
+        Matrix V_t = svd.getV().transpose();
+        Matrix UV_t = U.times(V_t);
+        double det_UV_t = UV_t.det();
 
         double[][] mid_matrix_temp = {
                 {1.0, 0.0, 0.0},
                 {0.0, 1.0, 0.0},
-                {0.0, 0.0, det_VU_t}
+                {0.0, 0.0, det_UV_t}
         };
         Matrix mid_matrix = new Matrix(mid_matrix_temp);
 
-        Matrix R_opt = svd.getV().times(mid_matrix);
-        R_opt = R_opt.times(U_t);
+        Matrix R_opt = U.times(mid_matrix);
+        R_opt = R_opt.times(V_t);
 
         return R_opt;
     }
