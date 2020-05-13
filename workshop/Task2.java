@@ -68,9 +68,14 @@ public class Task2 extends PjWorkshop {
 
     /** This function is called when the RUN button is pressed */
     public void run() {
+
         PsDebug.message("RUN pressed");
 
+        long start = System.currentTimeMillis();
+
         PdVector[] randomVectorsP = getRandomVectors(this.p, false);
+
+        long afterRandomPoints = System.currentTimeMillis();
 
         boolean converged = false;
         int steps = 0;
@@ -157,7 +162,13 @@ public class Task2 extends PjWorkshop {
             m_surfQ.update(m_surfQ);
         }
 
+        long end = System.currentTimeMillis();
+
         PsDebug.message("CONVERGED IN " + steps + " STEPS");
+        PsDebug.message("Total time for completion: " + (end-start) + "ms");
+        PsDebug.message("Time for random point selection: " + (afterRandomPoints-start) + "ms");
+        PsDebug.message("Average time for each iteration: " + Math.round(((double)(end-afterRandomPoints)) / steps) + "ms");
+
 
         m_surfP.update(m_surfP);
         m_surfQ.update(m_surfQ);
