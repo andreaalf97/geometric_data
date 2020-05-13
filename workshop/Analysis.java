@@ -32,7 +32,7 @@ public class Analysis extends PjWorkshop {
             int numOfEdges = m_geom.getNumEdges();
             int numOfVertices = m_geom.getNumVertices();
             int numOfBorders = m_geom.getNumBoundaries();
-            int numOfFaces = m_geom.getNumBoundaries();
+            int numOfFaces = m_geom.getNumElements();
             String nums = "\n\n\nNumber of Edges: " + numOfEdges + "\nNumber of Vertices: " + numOfVertices + "\nNumber of Borders: " + numOfBorders + "\nNumber of Faces: " + numOfFaces;
 
             int genusNumValue = (2 - numOfVertices - numOfBorders - numOfFaces + numOfEdges)/2;
@@ -50,15 +50,14 @@ public class Analysis extends PjWorkshop {
             visitedTriangles = new boolean[m_geom.getNumElements()];
 
             while(numVisitedTriangles < m_geom.getNumElements()){
-                comp++;
                 for(int i = 0; i< visitedTriangles.length; i++){
                     if(!visitedTriangles[i]) {
+                        comp++;
                         breadthFirstTraversal(i);
                     }
                 }
-                PsDebug.message("\nComponents: " + comp);
             }
-            PsDebug.message("");
+            PsDebug.message("\nComponents: " + comp);
         }
     }
 
@@ -75,7 +74,7 @@ public class Analysis extends PjWorkshop {
         {
             // Dequeue a vertex from queue and print it
             x = queue.poll();
-            System.out.print(x + " ");
+
 
             // Get all adjacent vertices of the dequeued vertex s
             // If a adjacent has not been visited, then mark it
