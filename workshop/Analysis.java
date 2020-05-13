@@ -2,14 +2,15 @@ package workshop;
 
 import jv.geom.PgElementSet;
 import jv.object.PsDebug;
-
+import java.io.*;
+import java.util.*;
 import jvx.project.PjWorkshop;
 
 public class Analysis extends PjWorkshop {
 
     PgElementSet m_geom;
-    int visitedTriangles;
-    int[] unvisitedTringles ;
+    int numVisitedTriangles;
+    boolean[] visitedTriangles;
 
     /** Constructor */
     public Analysis() {
@@ -25,7 +26,7 @@ public class Analysis extends PjWorkshop {
         m_geom = surfP;
     }
 
-    public void genus(int index)
+    public void calculations(int index)
     {
         if(index == 0) {
             int numOfEdges = m_geom.getNumEdges();
@@ -45,16 +46,14 @@ public class Analysis extends PjWorkshop {
         }
         else if(index == 2) {
             int comp = 0;
-            visitedTriangles = 0;
-            unvisitedTringles = new int[m_geom.getNumElements()];
+            numVisitedTriangles = 0;
+            visitedTriangles = new boolean[m_geom.getNumElements()];
 
-            while(visitedTriangles < m_geom.getNumElements()){
+            while(numVisitedTriangles < m_geom.getNumElements()){
                 comp++;
-                for(int i = 0; i< unvisitedTringles.length; i++){
-                    if(unvisitedTringles[i] != -1) {
-                        unvisitedTringles[i] = -1;
-                        visitedTriangles++;
-                        bft(i);
+                for(int i = 0; i< visitedTriangles.length; i++){
+                    if(!visitedTriangles[i]) {
+                        breadthFirstTraversal(i);
                     }
                 }
                 PsDebug.message("\nComponents: " + comp);
@@ -63,18 +62,33 @@ public class Analysis extends PjWorkshop {
         }
     }
 
-    public void bft(int x){
-        PsDebug.message("\nVisited: " + visitedTriangles + " / " + m_geom.getNumElements());
-        PsDebug.message("Visited: " + x);
-        if(m_geom.getNeighbour(x) == null)
-            return;
-        for (int j = 0; j < m_geom.getNeighbour(x).m_data.length; j++) {
-            if (unvisitedTringles[m_geom.getNeighbour(x).m_data[j]] != -1) {
-                unvisitedTringles[m_geom.getNeighbour(x).m_data[j]] = -1;
-                visitedTriangles++;
-                bft(m_geom.getNeighbour(x).m_data[j]);
-                PsDebug.message("pp " + m_geom.getNeighbour(x).m_data[j]);
+    public void breadthFirstTraversal(int x){
+        // Create a queue for BFS
+        LinkedList<Integer> queue = new LinkedList<Integer>();
+
+        // Mark the current node as visited and enqueue it
+        visitedTriangles[x] = true;
+        numVisitedTriangles++;
+        queue.add(x);
+
+        while (queue.size() != 0)
+        {
+            // Dequeue a vertex from queue and print it
+            x = queue.poll();
+            System.out.print(x + " ");
+
+            // Get all adjacent vertices of the dequeued vertex s
+            // If a adjacent has not been visited, then mark it
+            // visited and enqueue it
+            for (int j = 0; j < m_geom.getNeighbour(x).m_data.length; j++){
+                int neighbour = m_geom.getNeighbour(x).m_data[j];
+                if(!visitedTriangles[neighbour]) {
+                    numVisitedTriangles++;
+                    visitedTriangles[neighbour] = true;
+                    queue.add(neighbour);
+                }
             }
         }
+
     }
 }
