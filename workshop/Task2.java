@@ -105,7 +105,7 @@ public class Task2 extends PjWorkshop {
 
                 Matrix M = computeM(p_subset, p_centroid, q_subset, q_centroid);
 
-                R_opt = computeSVDapprox(M.svd());
+                R_opt = computeSVDapproxEuclidean(M.svd());
                 T_opt = computeTopt(R_opt, q_centroid, p_centroid);
             }
             else{
@@ -137,7 +137,7 @@ public class Task2 extends PjWorkshop {
                         {-r[1], r[0], 1}
                 };
 
-                R_opt = computeSVDapprox((new Matrix(R_linear)).svd());
+                R_opt = computeSVDapproxPlane((new Matrix(R_linear)).svd());
 
             }
 
@@ -296,7 +296,7 @@ public class Task2 extends PjWorkshop {
     }
 
     /** This function computes the R_optimal matrix */
-    private Matrix computeSVDapprox(SingularValueDecomposition svd) {
+    private Matrix computeSVDapproxPlane(SingularValueDecomposition svd) {
 
         //Matrix U_t = svd.getU().transpose();
         //Matrix VU_t = svd.getV().times(U_t);
@@ -316,6 +316,25 @@ public class Task2 extends PjWorkshop {
 
         Matrix R_opt = U.times(mid_matrix);
         R_opt = R_opt.times(V_t);
+
+        return R_opt;
+    }
+
+    private Matrix computeSVDapproxEuclidean(SingularValueDecomposition svd){
+
+        Matrix U_t = svd.getU().transpose();
+        Matrix VU_t = svd.getV().times(U_t);
+        double det_VU_t = VU_t.det();
+
+        double[][] mid_matrix_temp = {
+                {1.0, 0.0, 0.0},
+                {0.0, 1.0, 0.0},
+                {0.0, 0.0, det_VU_t}
+        };
+        Matrix mid_matrix = new Matrix(mid_matrix_temp);
+
+        Matrix R_opt = svd.getV().times(mid_matrix);
+        R_opt = R_opt.times(U_t);
 
         return R_opt;
     }
@@ -495,8 +514,8 @@ public class Task2 extends PjWorkshop {
         this.conv_precision = precision;
     }
 
-    public void changeDistanceMetric() {
-        this.euclideanDistance = ! this.euclideanDistance;
+    public void setEuclidean(boolean val) {
+        this.euclideanDistance = val;
         PsDebug.message("Euclidean Distance: " + this.euclideanDistance);
     }
 }

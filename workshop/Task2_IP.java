@@ -220,14 +220,15 @@ public class Task2_IP extends PjWorkshop_IP implements ActionListener{
             }
         }
         else if(source == m_bChangeDistanceMetric){
-            m_task2.changeDistanceMetric();
             if(euclideanDistance){
                 m_bChangeDistanceMetric.setLabel("POINT TO PLANE DISTANCE");
                 euclideanDistance = false;
+                m_task2.setEuclidean(false);
             }
             else {
                 m_bChangeDistanceMetric.setLabel("EUCLIDEAN DISTANCE");
                 euclideanDistance = true;
+                m_task2.setEuclidean(true);
             }
         }
     }
