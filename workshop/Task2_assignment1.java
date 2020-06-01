@@ -17,7 +17,7 @@ import jvx.project.PjWorkshop;
  *  Workshop for surface registration
  */
 
-public class Task2 extends PjWorkshop {
+public class Task2_assignment1 extends PjWorkshop {
 
     /** First surface to be registered. */
     PgElementSet	m_surfP;
@@ -34,9 +34,9 @@ public class Task2 extends PjWorkshop {
 
 
     /** Constructor */
-    public Task2() {
+    public Task2_assignment1() {
         super("Surface Registration");
-        if (getClass() == Task2.class) {
+        if (getClass() == Task2_assignment1.class) {
             init();
         }
     }

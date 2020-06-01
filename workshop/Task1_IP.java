@@ -7,11 +7,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import jv.number.PuDouble;
 import jv.object.PsConfig;
+import jv.object.PsDebug;
 import jv.object.PsDialog;
 import jv.object.PsUpdateIf;
+import jvx.numeric.PnSparseMatrix;
 import jvx.project.PjWorkshop_IP;
 
 public class Task1_IP extends PjWorkshop_IP implements ActionListener {
@@ -20,6 +24,11 @@ public class Task1_IP extends PjWorkshop_IP implements ActionListener {
     protected Button    m_matrixL;
     protected Button    m_matrixS;
     protected Button    m_matrixM;
+
+    PnSparseMatrix      G;
+    PnSparseMatrix      S;
+    PnSparseMatrix      M;
+    PnSparseMatrix      L;
 
 
     protected Task1     m_task1;
@@ -88,20 +97,67 @@ public class Task1_IP extends PjWorkshop_IP implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         if (source == m_matrixG) {
-            m_task1.matrixG();
-            return;
+            try {
+                this.G = m_task1.matrixG();
+                return;
+            }
+            catch (RuntimeException e){
+                PsDebug.message("EXCEPTION!");
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                PsDebug.message(sw.toString());
+            }
         }
         else if (source == m_matrixL) {
-            m_task1.matrixL();
-            return;
+            try {
+//                if (this.G == null)
+//                    this.G = m_task1.matrixG();
+//                if(this.M == null)
+//                    this.M = m_task1.matrixM();
+//                if(this.S == null)
+//                    this.S = m_task1.matrixS(this.G);
+
+                this.L = m_task1.matrixL_combinatorial();
+                return;
+            }
+            catch (RuntimeException e){
+                PsDebug.message("EXCEPTION!");
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                PsDebug.message(sw.toString());
+            }
         }
         else if (source == m_matrixS) {
-            m_task1.matrixS();
-            return;
+            try {
+                if (this.G == null)
+                    this.G = m_task1.matrixG();
+                m_task1.matrixS(this.G);
+                return;
+            }
+            catch (RuntimeException e){
+                PsDebug.message("EXCEPTION!");
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                PsDebug.message(sw.toString());
+            }
         }
         else if (source == m_matrixM) {
-            m_task1.matrixM();
-            return;
+            try {
+                if (this.G == null)
+                    this.G = m_task1.matrixG();
+                this.M = m_task1.matrixM();
+                return;
+            }
+            catch (RuntimeException e){
+                PsDebug.message("EXCEPTION!");
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                PsDebug.message(sw.toString());
+            }
         }
     }
     /**

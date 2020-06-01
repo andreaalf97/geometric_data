@@ -2,15 +2,11 @@ package menu;
 
 import jv.geom.PgPointSet_Menu;
 import jv.geom.PgElementSet;
-import jv.geom.PgPointSet;
 import jv.object.PsDebug;
 import jv.object.PsDialog;
-import jv.objectGui.PsMethodMenu;
 import jv.object.PsObject;
-import jv.project.PgGeometryIf;
 import jv.project.PvDisplayIf;
 import jv.project.PvViewerIf;
-import jv.vecmath.PdVector;
 import jvx.project.PjWorkshop_Dialog;
 import workshop.*;
 
@@ -19,8 +15,8 @@ public class PgElementSet_Menu extends PgPointSet_Menu {
 	private enum MenuEntry{
 		MyWorkshop			("MyWorkshop..."),
 		Registration		("Surface Registration..."),
-		Task2				("Task 2..."),
-		Task1				("Task 1...")
+		Task2				("Task 2 Practical 1..."),
+		Task1				("Task 1 Practical 2...")
 		// Additional entries...
 		;
 		protected final String name;
@@ -92,7 +88,7 @@ public class PgElementSet_Menu extends PgPointSet_Menu {
 			dialog.setVisible(true);
 			break;
 		case Task2:
-			Task2 task2 = new Task2();
+			Task2_assignment1 task2 = new Task2_assignment1();
 			task2.setGeometry(m_elementSet);
 			if (currDisp == null) {
 				if (PsDebug.WARNING) PsDebug.warning("missing display.");

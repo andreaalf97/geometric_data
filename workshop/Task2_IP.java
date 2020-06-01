@@ -39,7 +39,7 @@ public class Task2_IP extends PjWorkshop_IP implements ActionListener{
     protected   PuDouble        m_precision;
     protected   Button          m_runButton;
 
-    protected	Task2           m_task2;
+    protected Task2_assignment1 m_task2;
 
     private boolean euclideanDistance = true;
 
@@ -62,7 +62,7 @@ public class Task2_IP extends PjWorkshop_IP implements ActionListener{
     /** Assign a parent object. */
     public void setParent(PsUpdateIf parent) {
         super.setParent(parent);
-        m_task2 = (Task2)parent;
+        m_task2 = (Task2_assignment1)parent;
 
         addSubTitle("Select surfaces for task 2");
 
