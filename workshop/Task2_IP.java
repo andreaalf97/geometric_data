@@ -109,10 +109,9 @@ public class Task2_IP extends PjWorkshop_IP implements ActionListener{
         if (source == m_runButton) {
             try {
                 double[][] A = new double[3][3];
-                for(int i = 0; i < 9; i++){
-                    A[i/3][i%3] = Double.parseDouble(m_textFields[i].getText());
+                for(int i = 0; i < 9; i++) {
+                    A[i / 3][i % 3] = Double.parseDouble(m_textFields[i].getText());
                 }
-                PsDebug.message(A.toString());
                 m_task2.run(A);
                 return;
             }
