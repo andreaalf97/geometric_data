@@ -15,7 +15,7 @@ public class PgElementSet_Menu extends PgPointSet_Menu {
 	private enum MenuEntry{
 		MyWorkshop			("MyWorkshop..."),
 		Registration		("Surface Registration..."),
-		Task2				("Task 2 Practical 1..."),
+		Task2				("Task 2 Practical 2..."),
 		Task1				("Task 1 Practical 2...")
 		// Additional entries...
 		;
@@ -88,7 +88,7 @@ public class PgElementSet_Menu extends PgPointSet_Menu {
 			dialog.setVisible(true);
 			break;
 		case Task2:
-			Task2_assignment1 task2 = new Task2_assignment1();
+			Task2 task2 = new Task2();
 			task2.setGeometry(m_elementSet);
 			if (currDisp == null) {
 				if (PsDebug.WARNING) PsDebug.warning("missing display.");
@@ -97,10 +97,8 @@ public class PgElementSet_Menu extends PgPointSet_Menu {
 			dialog = new PjWorkshop_Dialog(false);
 			dialog.setParent(task2);
 			dialog.update(task2);
-			dialog.setSize(700, 400);
 			dialog.setVisible(true);
 			break;
-			
 		case Task1:
 			Task1 task1 = new Task1();
 			task1.setGeometry(m_elementSet);
