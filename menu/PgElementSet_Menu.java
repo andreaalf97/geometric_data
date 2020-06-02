@@ -15,8 +15,9 @@ public class PgElementSet_Menu extends PgPointSet_Menu {
 	private enum MenuEntry{
 		MyWorkshop			("MyWorkshop..."),
 		Registration		("Surface Registration..."),
-		Task2				("Task 2 Practical 1..."),
-		Task1				("Task 1 Practical 2...")
+		Task2_assignment1   ("Task 2 Practical 1..."),
+		Task1				("Task 1 Practical 2..."),
+		Task2_extras		("Task 2 EXTRAS")
 		// Additional entries...
 		;
 		protected final String name;
@@ -87,7 +88,7 @@ public class PgElementSet_Menu extends PgPointSet_Menu {
 			dialog.update(reg);
 			dialog.setVisible(true);
 			break;
-		case Task2:
+		case Task2_assignment1:
 			Task2_assignment1 task2 = new Task2_assignment1();
 			task2.setGeometry(m_elementSet);
 			if (currDisp == null) {
@@ -111,6 +112,19 @@ public class PgElementSet_Menu extends PgPointSet_Menu {
 			dialog = new PjWorkshop_Dialog(false);
 			dialog.setParent(task1);
 			dialog.update(task1);
+			dialog.setVisible(true);
+			break;
+
+		case Task2_extras:
+			Task2_Extras task2_extras = new Task2_Extras();
+			task2_extras.setGeometry(m_elementSet);
+			if (currDisp == null) {
+				if (PsDebug.WARNING) PsDebug.warning("missing display.");
+			} else
+				task2_extras.setDisplay(currDisp);
+			dialog = new PjWorkshop_Dialog(false);
+			dialog.setParent(task2_extras);
+			dialog.update(task2_extras);
 			dialog.setVisible(true);
 			break;
 		}

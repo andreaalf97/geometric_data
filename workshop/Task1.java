@@ -114,7 +114,7 @@ public class Task1 extends PjWorkshop {
         return G;
     }
 
-    private void printSparseMatrix(String name, PnSparseMatrix matrix) {
+    public static void printSparseMatrix(String name, PnSparseMatrix matrix) {
 
         int counter = 0;
 
@@ -176,9 +176,9 @@ public class Task1 extends PjWorkshop {
         return b;
     }
 
-    private void printPdVector(String name, PdVector vect) {
+    public static void printPdVector(String name, PdVector vect) {
         String s = "";
-        for(int i = 0; i < vect.getSize(); i++)
+        for(int i = 0; i < 5; i++)
             s += "" + vect.getEntry(i) + " ";
         PsDebug.message(name + ":");
         PsDebug.message(s);
@@ -192,7 +192,7 @@ public class Task1 extends PjWorkshop {
         PsDebug.message(s);
     }
 
-    /** Compute combinatiorial matrix L. */
+    /** Compute matrix L. */
     public PnSparseMatrix matrixL(PnSparseMatrix M, PnSparseMatrix S) {
 
         PsDebug.message("Starting matrix L computation...");
@@ -234,6 +234,10 @@ public class Task1 extends PjWorkshop {
         return L;
     }
 
+    /**
+     * Compute combinatorial L matrix
+     * @return
+     */
     public PnSparseMatrix matrixL_combinatorial(){
         PsDebug.message("Starting matrix L computation...");
 
@@ -252,7 +256,7 @@ public class Task1 extends PjWorkshop {
             if(i % 10000 == 0)
                 PsDebug.message("Vertex " + i + " of " + n);
 
-            int degree = 0;
+
             ArrayList<Integer> neighbours = new ArrayList<>();
 
             for(int j = 0; j < m; j++)
@@ -261,8 +265,9 @@ public class Task1 extends PjWorkshop {
                     for(int vertex_index : face.getEntries())
                         if(!neighbours.contains(vertex_index))
                             neighbours.add(vertex_index);
-                    degree++;
                 }
+
+            int degree = neighbours.size();
 
             double diag_element = 0;
             for(int vertex_index : neighbours){
