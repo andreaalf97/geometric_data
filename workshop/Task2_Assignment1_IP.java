@@ -28,7 +28,7 @@ import jvx.project.PjWorkshop_IP;
  * Info Panel of Workshop for surface registration
  *
  */
-public class Task2_IP extends PjWorkshop_IP implements ActionListener{
+public class Task2_Assignment1_IP extends PjWorkshop_IP implements ActionListener{
     protected	List			m_listActive;
     protected	List			m_listPassive;
     protected	Vector			m_geomList;
@@ -44,9 +44,9 @@ public class Task2_IP extends PjWorkshop_IP implements ActionListener{
     private boolean euclideanDistance = true;
 
     /** Constructor */
-    public Task2_IP () {
+    public Task2_Assignment1_IP() {
         super();
-        if (getClass() == Task2_IP.class)
+        if (getClass() == Task2_Assignment1_IP.class)
             init();
     }
 

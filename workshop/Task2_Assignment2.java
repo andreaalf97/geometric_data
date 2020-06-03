@@ -18,13 +18,13 @@ import java.util.Collections;
  *  Workshop for matrices computation.
  */
 
-public class Task2_Extras extends PjWorkshop {
+public class Task2_Assignment2 extends PjWorkshop {
 
     /** Mesh to compute matrices. */
     PgElementSet m_geom;
 
     /** Constructor */
-    public Task2_Extras() {
+    public Task2_Assignment2() {
         super("Task 2 Extras");
         init();
     }
@@ -148,7 +148,7 @@ public class Task2_Extras extends PjWorkshop {
         return L;
     }
 
-    public void run(boolean useLaplace) throws Exception{
+    public void run(boolean useLaplace, double[][] A) throws Exception{
         PsDebug.message("RUNNING TASK 2 EXTRAS");
 
         m_geom = (PgElementSet)super.m_geom;
@@ -215,12 +215,8 @@ public class Task2_Extras extends PjWorkshop {
         PdVector g_y_tilde = PdVector.copyNew(g_y);
         PdVector g_z_tilde = PdVector.copyNew(g_z);
 
-        double[][] deform_temp = {
-                {2, 0, 0},
-                {0, 2, 0},
-                {0, 0, 2}
-        };
-        PdMatrix deform = new PdMatrix(deform_temp);
+
+        PdMatrix deform = new PdMatrix(A);
 
         PsDebug.message("CHECKING SELECTED FACES");
 

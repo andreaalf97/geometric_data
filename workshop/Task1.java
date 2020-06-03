@@ -111,6 +111,8 @@ public class Task1 extends PjWorkshop {
 
 //        printSparseMatrix("G matrix", G);
 
+        PsDebug.message("COMPLETED MATRIX G CALCULATION AND TESTING");
+
         return G;
     }
 
@@ -231,6 +233,9 @@ public class Task1 extends PjWorkshop {
 
 
         printSparseMatrix("L", L);
+
+        PsDebug.message("COMPLETED MATRIX L CALCULATION AND TESTING");
+
         return L;
     }
 
@@ -316,6 +321,9 @@ public class Task1 extends PjWorkshop {
         PsDebug.message("**********************************************");
 
         printSparseMatrix("M", L);
+
+        PsDebug.message("COMPLETED MATRIX L CALCULATION AND TESTING");
+
         return L;
     }
 
@@ -386,6 +394,9 @@ public class Task1 extends PjWorkshop {
 
 
         printSparseMatrix("S", S);
+
+        PsDebug.message("COMPLETED MATRIX S CALCULATION AND TESTING");
+
         return S;
     }
 
@@ -432,6 +443,9 @@ public class Task1 extends PjWorkshop {
 
 
         printSparseMatrix("M", M);
+
+        PsDebug.message("COMPLETED MATRIX M CALCULATION AND TESTING");
+
         return M;
 
     }

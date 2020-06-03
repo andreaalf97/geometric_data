@@ -5,29 +5,38 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Vector;
 
+import jv.number.PuDouble;
 import jv.object.PsDebug;
 import jv.object.PsDialog;
 import jv.object.PsUpdateIf;
 import jvx.project.PjWorkshop_IP;
 
-public class Task2_Extras_IP extends PjWorkshop_IP implements ActionListener {
+public class Task2_Assignment2_IP extends PjWorkshop_IP implements ActionListener {
 
-    protected Button m_runButton;
-    protected Button m_resetButton;
+    protected	List			m_listActive;
+    protected	List			m_listPassive;
+    protected   Vector          m_geomList;
+    protected   PuDouble        m_pSlider;
+    protected   Button          m_setVertexButton;
+    protected   Button          m_setLaplaceButton;
+    protected   Button          m_runButton;
+    protected   TextField[]     m_textFields = new TextField[9];
 
-    protected Task2_Extras m_task2Extras;
+    protected boolean           useLaplace = false;
+    protected Task2_Assignment2 m_task2_assignment2;
 
     /** Constructor */
-    public Task2_Extras_IP () {
+    public Task2_Assignment2_IP() {
         super();
-        if (getClass() == Task2_Extras_IP.class)
+        if (getClass() == Task2_Assignment2_IP.class)
             init();
     }
 
     public void init() {
         super.init();
-        setTitle("Task2_Extras");
+        setTitle("Task2_Assignment2");
     }
 
     public String getNotice() {
@@ -36,7 +45,7 @@ public class Task2_Extras_IP extends PjWorkshop_IP implements ActionListener {
 
     public void setParent(PsUpdateIf parent) {
         super.setParent(parent);
-        m_task2Extras = (Task2_Extras)parent;
+        m_task2_assignment2 = (Task2_Assignment2)parent;
 
         addSubTitle("Insert values of table A: ");
 
@@ -54,23 +63,29 @@ public class Task2_Extras_IP extends PjWorkshop_IP implements ActionListener {
 
         Panel pButtons = new Panel(new BorderLayout());
         pButtons.setLayout(new GridLayout(3, 1));
-        Panel pVertexButton = new Panel(new BorderLayout());
-        m_runButton = new Button("Vertex Coordinates");
+
+        Panel pVertexPanel = new Panel(new BorderLayout());
+        m_setVertexButton = new Button("Vertex Coordinates");
+        m_setVertexButton.addActionListener(this);
+        pVertexPanel.add(m_setVertexButton, BorderLayout.CENTER);
+
+        Panel pLaplacePanel = new Panel(new BorderLayout());
+        m_setLaplaceButton = new Button("Laplace Coordinates");
+        m_setLaplaceButton.addActionListener(this);
+        pLaplacePanel.add(m_setLaplaceButton, BorderLayout.CENTER);
+
+        Panel runPanel = new Panel(new BorderLayout());
+        m_runButton = new Button("RUN");
         m_runButton.addActionListener(this);
-        pVertexButton.add(m_runButton, BorderLayout.CENTER);
-        Panel pLaplaceButton = new Panel(new BorderLayout());
-        m_runButton = new Button("Laplace Coordinates");
-        m_runButton.addActionListener(this);
-        pLaplaceButton.add(m_runButton, BorderLayout.CENTER);
-        Panel pUndoButton = new Panel(new BorderLayout());
-        m_undoButton = new Button("Undo");
-        m_undoButton.addActionListener(this);
-        pUndoButton.add(m_undoButton, BorderLayout.CENTER);
-        pButtons.add(pVertexButton);
-        pButtons.add(pLaplaceButton);
-        pButtons.add(pUndoButton);
+        runPanel.add(m_runButton, BorderLayout.CENTER);
+
+        pButtons.add(pVertexPanel);
+        pButtons.add(pLaplacePanel);
+        pButtons.add(runPanel);
+
         pGeometries.add(pButtons);
         add(pGeometries);
+
         validate();
     }
 
@@ -85,16 +100,26 @@ public class Task2_Extras_IP extends PjWorkshop_IP implements ActionListener {
                 for(int i = 0; i < 9; i++) {
                     A[i / 3][i % 3] = Double.parseDouble(m_textFields[i].getText());
                 }
-                m_task2.run(A);
+                m_task2_assignment2.run(useLaplace, A);
                 return;
             }
-            catch (RuntimeException e){
+            catch (Exception e){
                 PsDebug.message("EXCEPTION!");
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);
                 PsDebug.message(sw.toString());
             }
+        }
+        else if(source == m_setLaplaceButton){
+            this.useLaplace = true;
+            PsDebug.message("Using Laplace Coords");
+            return;
+        }
+        else if(source == m_setVertexButton){
+            this.useLaplace = false;
+            PsDebug.message("Using Vertex Coords");
+            return;
         }
     }
     /**
