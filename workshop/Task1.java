@@ -50,7 +50,6 @@ public class Task1 extends PjWorkshop {
         PsDebug.message("Starting matrix G computation...");
 
 
-        /*OUT OF THE FUNCTION?*/
         //Number of faces
 //        PsDebug.message(m_geom.toString());
         int m = m_geom.getNumElements();
@@ -60,8 +59,6 @@ public class Task1 extends PjWorkshop {
 
         PnSparseMatrix G = new PnSparseMatrix(3*m,n,3);
 
-        /*---------------*/
-
 
         // for over all the faces of the mesh
         for(int i = 0; i < m; i++) {
@@ -70,7 +67,7 @@ public class Task1 extends PjWorkshop {
            PdMatrix G_local = calcLocalGradientMatrix(i);
 
            //local vertices
-           PiVector loc_vertices = m_geom.getElement(i); //esto devuelve vertices index en orden
+           PiVector loc_vertices = m_geom.getElement(i); 
 //            if(i == 0)
 //                printPiVector("loc_vertices", loc_vertices);
 
@@ -109,7 +106,7 @@ public class Task1 extends PjWorkshop {
         }
 
 
-//        printSparseMatrix("G matrix", G);
+        printSparseMatrix("G matrix", G);
 
         PsDebug.message("COMPLETED MATRIX G CALCULATION AND TESTING");
 
@@ -194,7 +191,7 @@ public class Task1 extends PjWorkshop {
         PsDebug.message(s);
     }
 
-    /** Compute matrix L. */
+    /** Compute geometrical matrix L. */
     public PnSparseMatrix matrixL(PnSparseMatrix M, PnSparseMatrix S) {
 
         PsDebug.message("Starting matrix L computation...");
@@ -320,7 +317,7 @@ public class Task1 extends PjWorkshop {
         }
         PsDebug.message("**********************************************");
 
-        printSparseMatrix("M", L);
+        printSparseMatrix("L", L);
 
         PsDebug.message("COMPLETED MATRIX L CALCULATION AND TESTING");
 
@@ -358,21 +355,22 @@ public class Task1 extends PjWorkshop {
         int[] rows_to_check = {10, 20, 30, 50, 1000, 6000};
         int[] cols_to_check = {10, 20, 30, 50, 1000, 6000};
         boolean found = false;
-        for(int row : rows_to_check)
+        for(int row : rows_to_check) {
             for(int col : cols_to_check)
                 if(Math.abs(S.getEntry(row, col) - S.getEntry(col, row)) > 0.001) {
                     PsDebug.message("(" + row + ", " + col + ") is different than (" + row + ", " + col + ")");
                     found = true;
                 }
 
-        for(int row : rows_to_check) {
             double sum = 0;
             for (int col = 0; col < S.getNumCols(); col++)
                 if(col != row && S.getEntry(row, col) != 0.0)
                     sum += S.getEntry(row, col);
 
-            if(Math.abs((-sum) - S.getEntry(row, row)) > 0.001)
+            if(Math.abs((-sum) - S.getEntry(row, row)) > 0.001) {
                 PsDebug.message("For row " + row + " the sum is " + (-sum) + " but the diagonal is " + S.getEntry(row, row));
+                found = true;
+            }
         }
 
         PsDebug.message("**********************************************");
@@ -429,10 +427,10 @@ public class Task1 extends PjWorkshop {
                     counter++;
                 }
 
-            if(i == 50 || i == 60) {
-                PsDebug.message("" + i + " --> " + 1.0 / counter);
-                PsDebug.message("Degree" +  " --> " + counter);
-            }
+            // if(i == 50 || i == 60) {
+                // PsDebug.message("" + i + " --> " + 1.0 / counter);
+                // PsDebug.message("Degree" +  " --> " + counter);
+            // }
 
             total_area /= 3;
 
