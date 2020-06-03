@@ -1,8 +1,6 @@
 package workshop;
 
-import java.awt.Button;
-import java.awt.FlowLayout;
-import java.awt.Panel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
@@ -40,34 +38,41 @@ public class Task2_Extras_IP extends PjWorkshop_IP implements ActionListener {
         super.setParent(parent);
         m_task2Extras = (Task2_Extras)parent;
 
-        addSubTitle("RUN EXTRAS");
+        addSubTitle("Insert values of table A: ");
 
-        m_runButton = new Button("RUN");
+        /** Panel*/
+        Panel pGeometries = new Panel();
+        pGeometries.setLayout(new GridLayout(2, 1));
+
+        Panel pTextFields = new Panel(new BorderLayout());
+        pTextFields.setLayout(new GridLayout(3, 3));
+        for(int i=0; i<9; i++) {
+            m_textFields[i] = new TextField("0");
+            pTextFields.add(m_textFields[i], BorderLayout.CENTER);
+        }
+        pGeometries.add(pTextFields);
+
+        Panel pButtons = new Panel(new BorderLayout());
+        pButtons.setLayout(new GridLayout(3, 1));
+        Panel pVertexButton = new Panel(new BorderLayout());
+        m_runButton = new Button("Vertex Coordinates");
         m_runButton.addActionListener(this);
-        m_resetButton = new Button("Reset");
-        m_resetButton.addActionListener(this);
-        Panel panel1 = new Panel(new FlowLayout(FlowLayout.CENTER));
-        panel1.add(m_runButton);
-        panel1.add(m_resetButton);
-        add(panel1);
-
+        pVertexButton.add(m_runButton, BorderLayout.CENTER);
+        Panel pLaplaceButton = new Panel(new BorderLayout());
+        m_runButton = new Button("Laplace Coordinates");
+        m_runButton.addActionListener(this);
+        pLaplaceButton.add(m_runButton, BorderLayout.CENTER);
+        Panel pUndoButton = new Panel(new BorderLayout());
+        m_undoButton = new Button("Undo");
+        m_undoButton.addActionListener(this);
+        pUndoButton.add(m_undoButton, BorderLayout.CENTER);
+        pButtons.add(pVertexButton);
+        pButtons.add(pLaplaceButton);
+        pButtons.add(pUndoButton);
+        pGeometries.add(pButtons);
+        add(pGeometries);
         validate();
     }
-
-
-   /* public boolean update(Object event) {
-        if (event == m_xOff) {
-            m_ws.setXOff(m_xOff.getValue());
-            m_ws.m_geom.update(m_ws.m_geom);
-            return true;
-        }
-        if (event == m_rotateY) {
-            m_ws.setRotateY(m_rotateY.getValue());
-            m_ws.m_geom.update(m_ws.m_geom);
-            return true;
-        } else
-            return super.update(event);
-    }*/
 
     /**
      * Handle action events fired by buttons etc.
@@ -76,27 +81,12 @@ public class Task2_Extras_IP extends PjWorkshop_IP implements ActionListener {
         Object source = event.getSource();
         if (source == m_runButton) {
             try {
-                m_task2Extras.run(true);
-            }
-            catch (RuntimeException e){
-                PsDebug.message("RUNTIME EXCEPTION!");
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                PsDebug.message(sw.toString());
-            }
-            catch (Exception e){
-                PsDebug.message("EXCEPTION!");
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                PsDebug.message(sw.toString());
-            }
-
-        }
-        else if (source == m_resetButton) {
-            try {
-
+                double[][] A = new double[3][3];
+                for(int i = 0; i < 9; i++) {
+                    A[i / 3][i % 3] = Double.parseDouble(m_textFields[i].getText());
+                }
+                m_task2.run(A);
+                return;
             }
             catch (RuntimeException e){
                 PsDebug.message("EXCEPTION!");
